@@ -13,22 +13,44 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-      <a class="navbar-brand" href="#"><h1>MTG Tools</h1></a>
+      <a class="navbar-brand" href="#"><h1>MTG Set Info</h1></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto"></ul>
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="./index.html">An MTG Tool</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="https://scryfall.com/"><i>Powered By Scryfall</i></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#target_table">To Table</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#target_top">To Top</a>
+          </li>
+
+        </ul>
+          <div class="form-group">
+            <select class="form-control" id="sel1">
+            </select>
+          </div>
       </div>
     </nav>
 
-    <div class="container" style="width:100%;max-width:none;padding:1%;padding-top: 85px">
-      <h1><a href="./mtg_sets.html">MTG Set Info</a></h1>
-      <p>A simple application that allows for viewing all cards from any set as well as seeing a table representation of all those cards<p>
+    <div class="container image_field" style="width:100%;max-width:none;padding:1%;padding-top: 85px", id="target_top">
+    </div>
+
+    <div class="table-responsive" id="target_table" style="padding-top: 85px">
+      <table class="table thead-dark table-striped table-bordered">
+      </table>
     </div>
 
     <!-- Optional JavaScript -->
+    <script src="static/js/mtg_sets.js"></script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
