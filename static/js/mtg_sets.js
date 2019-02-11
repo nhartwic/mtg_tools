@@ -1,6 +1,8 @@
 // define starting set and URL for set information
 const URL = "https://api.scryfall.com/sets/"
 const start_set = "rna"
+var set_data = null
+
 
 function remove_dups(some_list){
   var seen = {}
@@ -12,7 +14,6 @@ function remove_dups(some_list){
     }
   })
 }
-
 
 
 // define key vals
@@ -52,10 +53,15 @@ display_keys = [
 var tbl = d3.select(".table")
 var imf = d3.select(".image_field")
 var dpm = d3.select("#sel1")
+var table_opt = d3.select("#table_control")
+var img_opt = d3.select("#image_control")
 imf.html("<h1>Loading Images</h1>")
 
-function create_table(set_data){
+function create_table(){
   tbl.html("")
+  if(!table_opt.property("checked")){
+    return
+  }
   var head_row = tbl.append("thead").append("tr")
   display_keys.forEach(function(k){
     head_row.append("th").text(k)
@@ -72,7 +78,7 @@ function create_table(set_data){
 }
 
 
-function clean_cards(set_data){
+function clean_cards(){
   var temp = set_data.map(function(card){
     if("card_faces" in card){
       cards = card.card_faces
@@ -95,20 +101,21 @@ function clean_cards(set_data){
 }
 
 
-function populate_page(set_data){
+function populate_page(){
   set_data = clean_cards(set_data)
-  console.log(set_data)
   imf.html("")
   var set_uris = set_data.map(x => x.image_uris.normal)
   set_uris = remove_dups(set_uris)
-  set_uris.forEach(function (card){
-    imf.append("img")
-         .attr("src", card)
-         .attr("class", "img-responsive")
-         .attr("style", "float: left; margin-right: 1%; margin-bottom: 0.5em;")
-         .attr("height", 352)
-         .attr("width", 252)
-  })
+  if(img_opt.property("checked")){
+    set_uris.forEach(function (card){
+      imf.append("img")
+           .attr("src", card)
+           .attr("class", "img-responsive")
+           .attr("style", "float: left; margin-right: 1%; margin-bottom: 0.5em;")
+           .attr("height", 352)
+           .attr("width", 252)
+    })
+  }
   set_data.forEach(o => transforms.forEach(f => f(o)))
   var display_data = []
   set_data.forEach(function(card){
@@ -128,12 +135,16 @@ function load_set(set_code, sets){
     d3.json(uri).then(function(result){
           cards = cards.concat(result.data)
           if(result.has_more){ recursive_read(result.next_page) }
-          else { populate_page(cards) }
+          else {
+            set_data = cards
+            populate_page()
+          }
       }
     )
   }
   recursive_read(set_uri)
 }
+
 
 // function performs inital page build once sets query has been
 // Executed
@@ -148,7 +159,6 @@ function init_build(result){
 
   dpm.on("change", function(){
     set_code = dpm.node().value
-    console.log(set_code)
     if(set_code == "Set Code"){ return null}
     tbl.html("")
     imf.html("<p>Resetting the page</p>")
@@ -159,5 +169,7 @@ function init_build(result){
   load_set(start_set, set_results)
 }
 
+table_opt.on("change", populate_page)
+img_opt.on("change", populate_page)
 // Execute initial query to fetch set codes and uri then build the page
 d3.json(URL).then(init_build)
