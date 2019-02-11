@@ -55,7 +55,7 @@ var imf = d3.select(".image_field")
 var dpm = d3.select("#sel1")
 var table_opt = d3.select("#table_control")
 var img_opt = d3.select("#image_control")
-imf.html("<h1>Loading Images</h1>")
+imf.html("<h1>Loading</h1>")
 
 function create_table(){
   tbl.html("")
