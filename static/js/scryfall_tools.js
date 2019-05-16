@@ -2,21 +2,35 @@
 function scryfall_tools(){
 
     /**
-     * Recursively get all cards from some uri then call func on the results
+     * wait ms milliseconds
      */
-    function get_all(uri, func){
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Async function which will iteratively get all data from input scryfall
+     * uri waiting 200 milliseconds between api calls.
+     */
+    async function get_all(uri){
+        var timestamp = 0
+
         var cards = []
-        function recursive_read(uri){
-            d3.json(uri).then(function(result){
-                cards = cards.concat(result.data)
-                if(result.has_more){ recursive_read(result.next_page) }
-                else {
-                    func(cards)
-                  }
-              }
-            )
-        }
-        recursive_read(uri)
+
+        do{
+            var curr_time = new Date().getTime()
+            while(curr_time - timestamp < 200){
+                console.log(curr_time)
+                await sleep(50)
+                curr_time = new Date().getTime()
+            }
+            timestamp = curr_time
+            var result = await(d3.json(uri))
+            cards = cards.concat(result.data)
+            uri = result.next_page
+        } while(result.has_more)
+
+        return cards
     }
 
     /**
@@ -29,8 +43,8 @@ function scryfall_tools(){
 
     return {
         "get_all": get_all,
-        "clean_cards": clean_cards,
-        "scryfall_uri": "https://api.scryfall.com/cards/search?q="
+        "scryfall_uri": "https://api.scryfall.com/cards/search?q=",
+        "scryfall_url": "https://scryfall.com/search?q="
     }
 
 }
