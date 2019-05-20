@@ -25,7 +25,7 @@ function scryfall_tools(){
                 curr_time = new Date().getTime()
             }
             timestamp = curr_time
-            var result = await(d3.json(uri))
+            var result = await d3.json(uri)
             cards = cards.concat(result.data)
             uri = result.next_page
         } while(result.has_more)
