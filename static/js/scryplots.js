@@ -27,6 +27,18 @@ function zip(data){
 }
 
 
+/**
+ * equivalent to the following in python
+ * list(range(start, stop, step))
+ */
+function range(stop, start=0, step=1){
+	var ret = []
+	for(var i=start; i< stop; i+=step){
+		ret.push(i)
+	}
+	return ret
+}
+
 
 // access opt forms that will be needed for build_cmc_plot
 var cmc_color_opt = d3.select("#cmc_color")
@@ -51,7 +63,6 @@ function build_cmc_plot(cards){
 	}
 	// [color, types, rarity], cmc
 	var card_data = cards.map(scrape)
-	console.log(card_data)
 
 	var keys = [
 		cmc_color_opt.property("checked"),
@@ -66,7 +77,6 @@ function build_cmc_plot(cards){
 		)
 		return [temp.slice(1,temp.length), cd[1]]
 	})
-	console.log(card_data)
 
 	var data_dict = {}
 	card_data.forEach(function(c){
@@ -78,7 +88,6 @@ function build_cmc_plot(cards){
 		}
 		data_dict[c[0]][c[1]] += 1
 	})
-	console.log(data_dict)
 	var data = Object.entries(data_dict).map(function(d){
 		return {
 			x: d[1].keys(),
@@ -97,21 +106,76 @@ function build_cmc_plot(cards){
 	Plotly.newPlot("cmc_plot", data, layout)
 }
 
+
+// access opt forms that will be needed for build mat plot
+var rarity_toggles = {
+	"common": d3.select("#mat_rarity_C"),
+	"uncommon": d3.select("#mat_rarity_U"),
+	"rare": d3.select("#mat_rarity_R"),
+	"mythic": d3.select("#mat_rarity_M"),
+}
+opt_fields.push(...Object.values(rarity_toggles))
+
+var color_toggles = {
+	"W": d3.select("#mat_color_W"),
+	"U": d3.select("#mat_color_U"),
+	"B": d3.select("#mat_color_B"),
+	"R": d3.select("#mat_color_R"),
+	"G": d3.select("#mat_color_G"),
+	"C": d3.select("#mat_color_C"),
+}
+opt_fields.push(...Object.values(color_toggles))
+
+var cmc_toggles = {
+	0: d3.select("#mat_cmc_0"),
+	1: d3.select("#mat_cmc_1"),
+	2: d3.select("#mat_cmc_2"),
+	3: d3.select("#mat_cmc_3"),
+	4: d3.select("#mat_cmc_4"),
+	5: d3.select("#mat_cmc_5"),
+	6: d3.select("#mat_cmc_6"),
+	7: d3.select("#mat_cmc_7"),
+}
+mat_big_cmc_toggle = d3.select("#mat_cmc_8")
+opt_fields.push(...Object.values(cmc_toggles))
+opt_fields.push(mat_big_cmc_toggle)
+
+
 /**
  * TODO : Update to use customized d3 logic as plotly doesn't support the desired slicing behavior
  */
 function build_mat_plot(cards){
 	// parse cards
-	var xValues = ['A', 'B', 'C', 'D', 'E']
+	cards = cards.filter( c => "power" in c)
+	cards = cards.map(c => [
+		[parseInt(c.power), parseInt(c.toughness)],
+		[c.rarity, c.cmc, c.color_identity.length==0 ? ["C"] : c.color_identity]
+	])
+	var valid_rarities = Object.entries(rarity_toggles).filter(
+		t => t[1].property("checked")
+	).map(t => t[0])
+	cards = cards.filter(c => valid_rarities.includes(c[1][0]))
 
-	var yValues = ['W', 'X', 'Y', 'Z']
+	var valid_colors = Object.entries(color_toggles).filter(
+		t => t[1].property("checked")
+	).map(t => t[0])
+	cards = cards.filter(c => valid_colors.some(col => c[1][2].includes(col)))
 
-	var zValues = [
-		[1, 2, 2, 1, 0],
-		[1, 2, 3, 2, 1],
-		[0, 1, 2, 2, 1],
-		[0, 0, 0, 1, 1],
-	]
+	var valid_cmcs = Object.entries(cmc_toggles).filter(
+	 	t => t[1].property("checked")
+	 ).map(t => parseInt(t[0]))
+	var big_cmc = mat_big_cmc_toggle.property("checked")
+	cards = cards.filter(c => valid_cmcs.includes(c[1][1]) || (big_cmc && c[1][1] >= 8))
+
+	var pmax = Math.max(...cards.map(c => c[0][0])) + 1
+	var tmax = Math.max(...cards.map(c => c[0][1])) + 1
+	var xValues = range(pmax)
+	var yValues = range(tmax)
+
+	var zValues = yValues.map(i => xValues.map(j => 0))
+	cards.forEach(function(c){
+		zValues[c[0][1]][c[0][0]] += 1
+	})
 
 	var data = [{
 		x: xValues,
@@ -124,7 +188,9 @@ function build_mat_plot(cards){
 
 	var layout = {
 		title: 'Creature Sizes',
-		annotations: []
+		annotations: [],
+		xaxis: {title:{text:"Power"}},
+		yaxis:{title:{text:"Toughness"}}
 	}
 
 	for ( var i = 0; i < yValues.length; i++ ) {
