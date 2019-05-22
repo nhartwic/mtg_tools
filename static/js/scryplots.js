@@ -246,7 +246,7 @@ function execute_query(){
 		main()
 	}
 	
-	st.get_all(query_uri).then(clear_load)
+	st.get_all(query_uri).then(clear_load).catch(e => clear_load([]))
 }
 
 // Do init build with default query (current set)
