@@ -148,7 +148,10 @@ function build_mat_plot(cards){
 	// parse cards
 	cards = cards.filter( c => "power" in c)
 	cards = cards.map(c => [
-		[parseInt(c.power), parseInt(c.toughness)],
+		[
+			parseInt(c.power!="*" ? c.power : "0"),
+			parseInt(c.toughness!="*" ? c.toughness : "0")
+		],
 		[c.rarity, c.cmc, c.color_identity.length==0 ? ["C"] : c.color_identity]
 	])
 	var valid_rarities = Object.entries(rarity_toggles).filter(
