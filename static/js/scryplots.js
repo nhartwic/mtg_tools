@@ -186,14 +186,22 @@ function build_mat_plot(cards){
 		z: zValues,
 		type: 'heatmap',
 		showscale: false,
-		colorscale: [[0, "#0000A0"], [1, "#ADD8E6"]]
+		colorscale: [[0, "rgba(0, 0, 255, 0.2)"], [1, "rgba(0,0, 255, 0.8)"]]
 	}]
 
 	var layout = {
 		title: 'Creature Sizes',
 		annotations: [],
-		xaxis: {title:{text:"Power"}},
-		yaxis:{title:{text:"Toughness"}}
+		xaxis: {
+			title: {text:"Power"},
+			showgrid: false,
+			zeroline: false
+		},
+		yaxis:{
+			title: {text:"Toughness"},
+			showgrid: false,
+			zeroline: false
+		},
 	}
 
 	for ( var i = 0; i < yValues.length; i++ ) {
