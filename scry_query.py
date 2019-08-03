@@ -32,7 +32,8 @@ def reformat_card(card):
 	ret["p"] = card.get("power", "")
 	ret["t"] = card.get("toughness", "")
 	ret["rarity"] = card["rarity"][0]
-	ret["text"] = card["oracle_text"]
+	ot = card["oracle_text"]
+	ret["text"] = "\\" + ot if(len(ot) > 0 and ot[0] == "+") else ot
 	ret["num"] = int(card["collector_number"])
 	return ret
 
@@ -64,4 +65,17 @@ def main():
 
 
 if(__name__ == "__main__"):
-	main()
+	# main()
+	def read_cards(fpath):
+		with open(fpath) as fin:
+			data = fin.read()
+		return data.split("\n")[:-1]
+
+	f1 = "rspc_20162017.txt"
+	f2 = "rspc_20162018_merged.txt"
+	f3 = "rspc_20172018.txt"
+	f1 = read_cards(f1)
+	f2 = read_cards(f2)
+	f3 = read_cards(f3)
+	print(" or ".join(['!"' + s + '"' for s in f3]))
+
