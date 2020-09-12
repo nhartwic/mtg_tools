@@ -79,6 +79,7 @@ def main():
 			"Access scryfall api, flatten results and dump to temp.txt. "
 			'Use =REGEXREPLACE(A2,";;",CHAR(10)) to reinsert new lines in '
 			"google sheets"
+		)
 	)
 	parser.add_argument(
 		"scry_args",
